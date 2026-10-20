@@ -12,12 +12,12 @@ jobs:
       image: ghcr.io/ylarod/ddk-min:${{ matrix.kmi }}-20260828
       options: --privileged
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - run: |
         cd kernel
         CONFIG_KSU=m CC=clang make
         cp kernelsu.ko /tmp/${{ matrix.kmi }}_kernelsu.ko
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: lkm-${{ matrix.kmi }}
         path: /tmp/${{ matrix.kmi }}_kernelsu.ko
@@ -26,8 +26,8 @@ jobs:
     needs: build-lkm
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/download-artifact@v4
+    - uses: actions/checkout@v7
+    - uses: actions/download-artifact@v8
       with:
         pattern: lkm-*
         path: ./all-lkm
@@ -37,7 +37,7 @@ jobs:
         cp all-lkm/*.ko userspace/ksud/bin/aarch64/
         rm -rf manager/app/src/main/cpp/uapi
         cp -r uapi manager/app/src/main/cpp/uapi
-    - uses: actions/setup-java@v4
+    - uses: actions/setup-java@v6
       with: { distribution: 'temurin', java-version: '21' }
     - uses: dtolnay/rust-toolchain@stable
       with: { targets: aarch64-linux-android }
@@ -57,7 +57,7 @@ jobs:
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/mykey.jks
         cd manager && chmod +x gradlew
         ./gradlew :app:assembleRelease -PKEYSTORE_FILE="$GITHUB_WORKSPACE/mykey.jks" -PKEYSTORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}" -PKEY_ALIAS="${{ secrets.KEY_ALIAS }}" -PKEY_PASSWORD="${{ secrets.KEY_PASSWORD }}" -PKSU_NAME=CoreSU -PKSU_PACKAGE_NAME=me.li.coresu
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: CoreSU-APK
         path: manager/app/build/outputs/apk/release/*.apk
