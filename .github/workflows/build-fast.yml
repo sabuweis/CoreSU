@@ -1,0 +1,34 @@
+name: Build Fast CoreSU
+on: workflow_dispatch
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - run: |
+        rm -rf manager/app/src/main/cpp/uapi
+        cp -r uapi manager/app/src/main/cpp/uapi
+    - uses: actions/setup-java@v4
+      with: { distribution: 'temurin', java-version: '21' }
+    - uses: dtolnay/rust-toolchain@stable
+      with: { targets: aarch64-linux-android }
+    - uses: nttld/setup-ndk@v1
+      id: setup-ndk
+      with: { ndk-version: r29 }
+    - run: |
+        source .github/scripts/setup-rust-build.sh aarch64-linux-android 26
+        BUILTINS="$($CLANG_PATH --print-resource-dir)/lib/linux/libclang_rt.builtins-aarch64-android.a"
+        export RUSTFLAGS="-C target-feature=+crt-static -C link-arg=-Wl,-z,max-page-size=16384 -C link-arg=-Wno-unused-command-line-argument -C link-arg=$BUILTINS"
+        cargo build --package ksuinit --target=aarch64-linux-android --release
+        cp target/aarch64-linux-android/release/ksuinit userspace/ksud/bin/aarch64/
+        cargo build --target aarch64-linux-android --release --manifest-path ./userspace/ksud/Cargo.toml
+        mkdir -p manager/app/src/main/jniLibs/arm64-v8a
+        cp target/aarch64-linux-android/release/ksud manager/app/src/main/jniLibs/arm64-v8a/libksud.so
+    - run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/mykey.jks
+        cd manager && chmod +x gradlew
+        ./gradlew :app:assembleRelease -PKEYSTORE_FILE="$GITHUB_WORKSPACE/mykey.jks" -PKEYSTORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}" -PKEY_ALIAS="${{ secrets.KEY_ALIAS }}" -PKEY_PASSWORD="${{ secrets.KEY_PASSWORD }}" -PKSU_NAME=CoreSU -PKSU_PACKAGE_NAME=me.li.coresu
+    - uses: actions/upload-artifact@v4
+      with:
+        name: CoreSU-Fast-APK
+        path: manager/app/build/outputs/apk/release/*.apk

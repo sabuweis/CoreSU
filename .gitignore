@@ -1,0 +1,9 @@
+build/
+target/
+.gradle/
+.cxx/
+.idea/
+*.jks
+*.keystore
+*.apk
+*.zip
