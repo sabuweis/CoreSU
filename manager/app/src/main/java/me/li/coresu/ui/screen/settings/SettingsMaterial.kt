@@ -49,11 +49,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import me.li.coresu.R
-import me.li.coresu.ui.screen.settings.tools.ToolsScreen
 import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import me.li.coresu.ui.UiMode
 import me.li.coresu.ui.component.KsuIsValid
+import me.li.coresu.ui.security.Stealth
+import me.li.coresu.ui.security.StealthCodeStore
+import me.li.coresu.ui.security.restartUiFresh
 import me.li.coresu.ui.component.material.ExpressiveScaffold
 import me.li.coresu.ui.component.material.SegmentedColumn
 import me.li.coresu.ui.component.material.SegmentedDropdownItem
@@ -132,29 +134,36 @@ fun SettingPagerMaterial(
             SegmentedColumn(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 13.dp),
                 content = buildList {
-
-                if (me.li.coresu.Natives.isManager && me.li.coresu.Natives.version != null) {
                     add {
-                        SegmentedListItem(
-                            onClick = { android.widget.Toast.makeText(context, "需内核支持", android.widget.Toast.LENGTH_SHORT).show() },
-                            headlineContent = { Text("动态管理器") },
-                            supportingContent = { Text("管理额外受信任的管理器") },
-                            leadingContent = { IconTile(Icons.Filled.AdminPanelSettings, "动态管理器") },
-                            trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) }
+                        SegmentedSwitchItem(
+                            icon = Icons.Filled.VerifiedUser,
+                            title = "隐身模式",
+                            summary = "界面伪装成未安装，超级用户/模块等页面全部隐藏",
+                            checked = stealthEnabled,
+                            onCheckedChange = { enabled ->
+                                val err = Stealth.setEnabledReporting(enabled)
+                                if (err != null) {
+                                    android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
+                                } else {
+                                    stealthEnabled = enabled
+                                    Stealth.ensureLauncherVisible(context)
+                                    restartUiFresh(context)
+                                }
+                            }
                         )
                     }
                     add {
                         SegmentedListItem(
-                            onClick = { showToolsScreen = true },
-                            headlineContent = { Text("更多高级功能: 工具") },
-                            supportingContent = { Text("SELinux、Umount路径") },
-                            leadingContent = { IconTile(Icons.Filled.DeveloperMode, "工具") },
+                            onClick = {
+                                secretInput = stealthCode
+                                showSecretKeyDialog = true
+                            },
+                            headlineContent = { Text("超级密钥") },
+                            supportingContent = { Text("用于在隐身模式下紧急呼出管理界面") },
+                            leadingContent = { Icon(Icons.Filled.Key, "超级密钥") },
                             trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) }
                         )
                     }
-                }
-
-
                     add {
                         SegmentedDropdownItem(
                             icon = Icons.Filled.DisplaySettings,
@@ -430,13 +439,3 @@ private fun TopBar(
     )
 }
 
-@androidx.compose.runtime.Composable
-private fun IconTile(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    contentDescription: String? = null
-) {
-    androidx.compose.material3.Icon(
-        imageVector = icon,
-        contentDescription = contentDescription
-    )
-}
