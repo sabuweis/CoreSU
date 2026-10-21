@@ -346,7 +346,7 @@ pub fn parse_kmi(buffer: &[u8]) -> Result<String> {
         .find_map(|(i, _)| {
             let a = &buffer[i..buffer.len().min(i + 100)];
             if let Some(e) = a.iter().position(|c| *c == 0)
-                && let Ok(s) = std::std::str::from_utf8(&a[..e])
+                && let Ok(s) = std::str::from_utf8(&a[..e])
                 && let Some(caps) = re.captures(s)
                 && let (Some(kernel_version), Some(android_version)) = (caps.get(1), caps.get(2))
             {
