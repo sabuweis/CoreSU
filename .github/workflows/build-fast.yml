@@ -11,8 +11,9 @@ jobs:
     - uses: actions/setup-java@v4
       with: { distribution: 'temurin', java-version: '21' }
 
-    # 使用文件里的 1.91.0，不写参数
     - uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: '1.91.0'
 
     - uses: nttld/setup-ndk@v1
       id: setup-ndk
@@ -28,13 +29,9 @@ jobs:
       run: |
         mkdir -p userspace/ksud/bin/aarch64
         source .github/scripts/setup-rust-build.sh aarch64-linux-android 26
-        
-        # 唯一的修改：去掉 crt-static，只保留 16KB page size 适配（这是 Android 15 必须的）
-        export RUSTFLAGS="-C link-arg=-Wl,-z,max-page-size=16384"
-        
+        export RUSTFLAGS="-C target-feature=-crt-static -C link-arg=-Wl,-z,max-page-size=16384"
         cargo build --package ksuinit --target=aarch64-linux-android --release
         cp target/aarch64-linux-android/release/ksuinit userspace/ksud/bin/aarch64/
-        
         cargo build --target aarch64-linux-android --release --manifest-path ./userspace/ksud/Cargo.toml
         mkdir -p manager/app/src/main/jniLibs/arm64-v8a
         cp target/aarch64-linux-android/release/ksud manager/app/src/main/jniLibs/arm64-v8a/libksud.so
