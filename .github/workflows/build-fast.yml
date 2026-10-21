@@ -12,7 +12,7 @@ jobs:
       with: { distribution: 'temurin', java-version: '21' }
     
     # 由于有了 rust-toolchain.toml，这里直接使用 stable 动作，它会自动读取文件
-    - uses: dtolnay/rust-toolchain@stable
+    - uses: dtolnay/rust-toolchain@master
 
     - uses: nttld/setup-ndk@v1
       id: setup-ndk
@@ -20,9 +20,11 @@ jobs:
     
     - name: Export NDK Environment
       run: echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+echo "ndk.dir=${{ steps.setup-ndk.outputs.ndk-path }}" >> manager/local.properties
 
     - name: Build Rust
       run: |
+        mkdir -p userspace/ksud/bin/aarch64
         source .github/scripts/setup-rust-build.sh aarch64-linux-android 26
         BUILTINS="$($CLANG_PATH --print-resource-dir)/lib/linux/libclang_rt.builtins-aarch64-android.a"
         export RUSTFLAGS="-C target-feature=+crt-static -C link-arg=-Wl,-z,max-page-size=16384 -C link-arg=-Wno-unused-command-line-argument -C link-arg=$BUILTINS"
