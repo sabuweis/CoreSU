@@ -59,7 +59,7 @@ jobs:
         BUILTINS="$($CLANG_PATH --print-resource-dir)/lib/linux/libclang_rt.builtins-aarch64-android.a"
         SYSROOT="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
         LIB_PATH="$SYSROOT/usr/lib/aarch64-linux-android/26"
-        export RUSTFLAGS="-C target-feature=+crt-static -C link-arg=-Wl,-z,max-page-size=16384 -C link-arg=-Wno-unused-command-line-argument -C link-arg=$BUILTINS -C link-arg=--sysroot=$SYSROOT -C link-arg=-L$LIB_PATH"
+        export RUSTFLAGS="-C link-arg=-Wl,-z,max-page-size=16384"
         cargo build --package ksuinit --target=aarch64-linux-android --release
         cp target/aarch64-linux-android/release/ksuinit userspace/ksud/bin/aarch64/
         cargo build --target aarch64-linux-android --release --manifest-path ./userspace/ksud/Cargo.toml
