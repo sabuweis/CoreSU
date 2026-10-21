@@ -15,7 +15,10 @@ jobs:
     - uses: nttld/setup-ndk@v1
       id: setup-ndk
       with: { ndk-version: r29 }
-    - run: |
+    - name: Build Rust
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      run: |
         source .github/scripts/setup-rust-build.sh aarch64-linux-android 26
         BUILTINS="$($CLANG_PATH --print-resource-dir)/lib/linux/libclang_rt.builtins-aarch64-android.a"
         export RUSTFLAGS="-C target-feature=+crt-static -C link-arg=-Wl,-z,max-page-size=16384 -C link-arg=-Wno-unused-command-line-argument -C link-arg=$BUILTINS"
