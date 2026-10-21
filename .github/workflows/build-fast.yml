@@ -10,14 +10,16 @@ jobs:
         cp -r uapi manager/app/src/main/cpp/uapi
     - uses: actions/setup-java@v4
       with: { distribution: 'temurin', java-version: '21' }
-    - uses: dtolnay/rust-toolchain@stable
+    - uses: dtolnay/rust-toolchain@1.85.0
       with: { targets: aarch64-linux-android }
     - uses: nttld/setup-ndk@v1
       id: setup-ndk
       with: { ndk-version: r29 }
+    
+    - name: Export NDK Environment
+      run: echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+
     - name: Build Rust
-      env:
-        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
       run: |
         source .github/scripts/setup-rust-build.sh aarch64-linux-android 26
         BUILTINS="$($CLANG_PATH --print-resource-dir)/lib/linux/libclang_rt.builtins-aarch64-android.a"
