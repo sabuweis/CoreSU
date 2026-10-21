@@ -1,6 +1,8 @@
 #include <string>
 #include <dlfcn.h>
 #include <cstdlib>
+#include <cstring>
+#include <cstdarg>
 #include <unistd.h>
 #include <vector>
 #include <sys/system_properties.h>
