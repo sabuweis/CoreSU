@@ -2,7 +2,7 @@
 
 mod init;
 
-use rustix::{cstr, runtime::execve};
+// use rustix::{cstr, runtime::execve};
 /// # Safety
 /// This is the entry point of the program
 /// We cannot use the main because rust will abort if we don't have std{in/out/err}
@@ -12,7 +12,7 @@ use rustix::{cstr, runtime::execve};
 pub unsafe extern "C" fn main(_argc: i32, argv: *const *const u8, envp: *const *const u8) -> i32 {
     let _ = init::init();
     unsafe {
-        execve(cstr!("/init"), argv, envp);
+        libc::execve(b"/init\0".as_ptr() as *const _, argv as *const *const _, envp as *const *const _);
     }
     0
 }

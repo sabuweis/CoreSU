@@ -159,7 +159,7 @@ fun flashIt(
 
 @Composable
 fun FlashEffect(
-    flashIt: FlashIt,
+    action: FlashIt,
     text: String,
     logContent: StringBuilder,
     onTextUpdate: (String) -> Unit,
@@ -174,7 +174,7 @@ fun FlashEffect(
         var currentText = text
         val mainHandler = Handler(Looper.getMainLooper())
         withContext(Dispatchers.IO) {
-            flashIt(flashIt, onStdout = {
+            flashIt(action, onStdout = {
                 val tempText = "$it\n"
                 if (tempText.startsWith("[H[J")) { // clear command
                     currentText = tempText.substring(6)
