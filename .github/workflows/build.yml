@@ -37,12 +37,13 @@ jobs:
         cp -r uapi manager/app/src/main/cpp/uapi
     - uses: actions/setup-java@v4
       with: { distribution: 'temurin', java-version: '21' }
-    - uses: dtolnay/rust-toolchain@1.85.0
-      with: { targets: aarch64-linux-android }
+    
+    - uses: dtolnay/rust-toolchain@stable
+    
     - uses: nttld/setup-ndk@v1
       id: setup-ndk
       with: { ndk-version: r29 }
-
+    
     - name: Export NDK Environment
       run: echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
 

@@ -10,8 +10,10 @@ jobs:
         cp -r uapi manager/app/src/main/cpp/uapi
     - uses: actions/setup-java@v4
       with: { distribution: 'temurin', java-version: '21' }
-    - uses: dtolnay/rust-toolchain@1.85.0
-      with: { targets: aarch64-linux-android }
+    
+    # 由于有了 rust-toolchain.toml，这里直接使用 stable 动作，它会自动读取文件
+    - uses: dtolnay/rust-toolchain@stable
+
     - uses: nttld/setup-ndk@v1
       id: setup-ndk
       with: { ndk-version: r29 }
