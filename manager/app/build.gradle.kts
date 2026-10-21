@@ -221,9 +221,6 @@ dependencies {
     implementation(libs.commonmark.ext.task.list.items)
 
     implementation(libs.androidx.webkit)
-
-    implementation(libs.lsposed.cxx)
-
     implementation(libs.hiddenapibypass)
 
     implementation(libs.miuix.ui)

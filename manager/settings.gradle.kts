@@ -6,7 +6,6 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         google()
-        maven("https://maven.lsposed.org/releases")
         mavenCentral()
     }
 }
@@ -14,7 +13,6 @@ pluginManagement {
 dependencyResolutionManagement {
     repositories {
         google()
-        maven("https://maven.lsposed.org/releases")
         mavenCentral()
         maven("https://jitpack.io")
     }
