@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.Adb
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Delete
@@ -77,10 +78,37 @@ fun SettingPagerMaterial(
     bottomInnerPadding: Dp,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
-    var showToolsScreen by remember { mutableStateOf(false) }
-    if (showToolsScreen) {
-        ToolsScreen(onBack = { showToolsScreen = false })
-        return
+    var stealthEnabled by remember { mutableStateOf(Stealth.isEnabled()) }
+    var stealthCode by remember { mutableStateOf(StealthCodeStore.effectiveCode(context)) }
+    var showSecretKeyDialog by remember { mutableStateOf(false) }
+    var secretInput by remember { mutableStateOf("") }
+
+    if (showSecretKeyDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showSecretKeyDialog = false },
+            title = { androidx.compose.material3.Text("超级密钥") },
+            text = {
+                androidx.compose.material3.OutlinedTextField(
+                    value = secretInput,
+                    onValueChange = { secretInput = it },
+                    label = { androidx.compose.material3.Text("密钥") },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    kotlin.concurrent.thread { StealthCodeStore.write(secretInput) }
+                    stealthCode = secretInput
+                    showSecretKeyDialog = false
+                    android.widget.Toast.makeText(context, "密钥已保存", android.widget.Toast.LENGTH_SHORT).show()
+                }) { androidx.compose.material3.Text("保存") }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showSecretKeyDialog = false }) {
+                    androidx.compose.material3.Text("取消")
+                }
+            }
+        )
     }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val snackBarHost = remember { SnackbarHostState() }
@@ -134,6 +162,7 @@ fun SettingPagerMaterial(
             SegmentedColumn(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 13.dp),
                 content = buildList {
+
                     add {
                         SegmentedSwitchItem(
                             icon = Icons.Filled.VerifiedUser,
@@ -164,6 +193,8 @@ fun SettingPagerMaterial(
                             trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) }
                         )
                     }
+
+
                     add {
                         SegmentedDropdownItem(
                             icon = Icons.Filled.DisplaySettings,
@@ -439,3 +470,10 @@ private fun TopBar(
     )
 }
 
+    contentDescription: String? = null
+) {
+    androidx.compose.material3.Icon(
+        imageVector = icon,
+        contentDescription = contentDescription
+    )
+}
