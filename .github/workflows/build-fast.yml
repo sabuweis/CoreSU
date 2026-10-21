@@ -11,7 +11,7 @@ jobs:
     - uses: actions/setup-java@v4
       with: { distribution: 'temurin', java-version: '21' }
 
-    - uses: dtolnay/rust-toolchain@1.88.0
+    - uses: dtolnay/rust-toolchain@1.91.0
       with:
         targets: aarch64-linux-android
 
