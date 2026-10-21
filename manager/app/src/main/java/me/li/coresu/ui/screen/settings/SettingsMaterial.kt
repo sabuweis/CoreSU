@@ -469,11 +469,3 @@ private fun TopBar(
         scrollBehavior = scrollBehavior
     )
 }
-
-    contentDescription: String? = null
-) {
-    androidx.compose.material3.Icon(
-        imageVector = icon,
-        contentDescription = contentDescription
-    )
-}
