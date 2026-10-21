@@ -61,7 +61,7 @@ fun FlashScreen(flashIt: FlashIt, onBackEnabledChange: (Boolean) -> Unit) {
     }
 
     FlashEffect(
-        flashIt = flashIt,
+        action = flashIt,
         text = text,
         logContent = logContent,
         onTextUpdate = { text = it },
