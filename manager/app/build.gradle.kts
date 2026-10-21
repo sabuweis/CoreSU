@@ -153,7 +153,7 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments += "-DANDROID_STL=none"
+                arguments += "-DANDROID_STL=c++_shared"
                 cFlags += baseCFlags + "-std=c2x"
                 cppFlags += baseCppFlags + "-std=c++2b"
             }
