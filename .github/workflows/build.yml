@@ -37,16 +37,18 @@ jobs:
         cp -r uapi manager/app/src/main/cpp/uapi
     - uses: actions/setup-java@v4
       with: { distribution: 'temurin', java-version: '21' }
-    
+
     - uses: dtolnay/rust-toolchain@master
-    
+
     - uses: nttld/setup-ndk@v1
       id: setup-ndk
       with: { ndk-version: r29 }
-    
+
     - name: Export NDK Environment
-      run: echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
-echo "ndk.dir=${{ steps.setup-ndk.outputs.ndk-path }}" >> manager/local.properties
+      run: |
+        echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+        rm -f manager/local.properties
+        echo "ndk.dir=${{ steps.setup-ndk.outputs.ndk-path }}" > manager/local.properties
 
     - name: Build Rust
       run: |
@@ -59,10 +61,18 @@ echo "ndk.dir=${{ steps.setup-ndk.outputs.ndk-path }}" >> manager/local.properti
         cargo build --target aarch64-linux-android --release --manifest-path ./userspace/ksud/Cargo.toml
         mkdir -p manager/app/src/main/jniLibs/arm64-v8a
         cp target/aarch64-linux-android/release/ksud manager/app/src/main/jniLibs/arm64-v8a/libksud.so
-    - run: |
+
+    - name: Sign APK
+      run: |
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/mykey.jks
         cd manager && chmod +x gradlew
-        ./gradlew :app:assembleRelease -PKEYSTORE_FILE="$GITHUB_WORKSPACE/mykey.jks" -PKEYSTORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}" -PKEY_ALIAS="${{ secrets.KEY_ALIAS }}" -PKEY_PASSWORD="${{ secrets.KEY_PASSWORD }}" -PKSU_NAME=CoreSU -PKSU_PACKAGE_NAME=me.li.coresu
+        ./gradlew :app:assembleRelease \
+          -PKEYSTORE_FILE="$GITHUB_WORKSPACE/mykey.jks" \
+          -PKEYSTORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}" \
+          -PKEY_ALIAS="${{ secrets.KEY_ALIAS }}" \
+          -PKEY_PASSWORD="${{ secrets.KEY_PASSWORD }}" \
+          -PKSU_NAME=CoreSU -PKSU_PACKAGE_NAME=me.li.coresu
+
     - uses: actions/upload-artifact@v4
       with:
         name: CoreSU-APK
