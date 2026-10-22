@@ -59,6 +59,9 @@ kernelsu-objs += feature/shell_su_adb_only.o
 
 ifdef KBUILD_EXTMOD
 ifeq ($(CONFIG_KSU_DISABLE_MANAGER),y)
+KSU_GIT_VERSION := $(shell git rev-list --count HEAD 2>/dev/null || echo 1)
+KSU_VERSION := $(shell expr 30000 + $(KSU_GIT_VERSION))
+ccflags-y += -DKSU_VERSION=$(KSU_VERSION)
 ccflags-y += -DCONFIG_KSU_DISABLE_MANAGER=1
 endif
 ifeq ($(CONFIG_KSU_DISABLE_POLICY),y)
@@ -107,8 +110,6 @@ KERNEL_GIT_ROOT := $(shell cd $(srctree) && $(GIT) rev-parse --show-toplevel 2>/
 ifneq ($(GIT_ROOT),$(KERNEL_GIT_ROOT))
 # Only set version if it's a different repo from kernel
 $(shell cd $(GIT_ROOT) && [ -f .git/shallow ] && $(GIT) fetch --unshallow 2>/dev/null || true)
-KSU_GIT_VERSION := $(shell cd $(GIT_ROOT) && $(GIT) rev-list --count HEAD 2>/dev/null)
-KSU_GIT_VERSION_VALID := 1
 $(info -- KernelSU: Git repo detected at $(GIT_ROOT))
 endif
 endif
@@ -118,15 +119,10 @@ endif
 
 
 # Calculate version if git version is available
-ifdef KSU_GIT_VERSION_VALID
 # ksu_version: major * 10000 + git version + 200 for historical reasons
-$(eval KSU_VERSION=$(shell expr 30000 + $(KSU_GIT_VERSION)))
 $(info -- KernelSU version: $(KSU_VERSION))
-ccflags-y += -DKSU_VERSION=$(KSU_VERSION)
 else
 # If there is no .git directory, use default version
-$(warning "KSU_GIT_VERSION not defined! It is better to make KernelSU a git repository!")
-#ccflags-y += -DKSU_VERSION=16
 endif
 
 KSU_NEW_DCACHE_FLUSH := $(shell grep -q __flush_dcache_area $(srctree)/arch/arm64/include/asm/cacheflush.h ; echo $$?)
