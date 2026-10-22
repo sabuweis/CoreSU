@@ -15,10 +15,6 @@ jobs:
         fetch-depth: 0
     - run: |
         cd kernel
-        COUNT=$(git rev-list --count HEAD 2>/dev/null || echo 1)
-        VER=$((30000 + COUNT))
-        echo "=> Compiling with KSU_VERSION=$VER"
-        export KSU_VERSION=$VER
         CONFIG_KSU=m CC=clang make
         cp kernelsu.ko /tmp/${{ matrix.kmi }}_kernelsu.ko
     - uses: actions/upload-artifact@v4

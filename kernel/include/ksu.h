@@ -5,6 +5,9 @@
 #include <linux/cred.h>
 #include <linux/workqueue.h>
 
+#ifndef KSU_VERSION
+#define KSU_VERSION 30001
+#endif
 #define KERNEL_SU_VERSION KSU_VERSION
 
 extern struct cred *ksu_cred;
