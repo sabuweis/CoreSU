@@ -42,8 +42,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -78,6 +83,7 @@ fun SettingPagerMaterial(
     bottomInnerPadding: Dp,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    val scope = rememberCoroutineScope()
     var stealthEnabled by remember { mutableStateOf(Stealth.isEnabled()) }
     var stealthCode by remember { mutableStateOf(StealthCodeStore.effectiveCode(context)) }
     var showSecretKeyDialog by remember { mutableStateOf(false) }
@@ -170,13 +176,20 @@ fun SettingPagerMaterial(
                             summary = "界面伪装成未安装，超级用户/模块等页面全部隐藏",
                             checked = stealthEnabled,
                             onCheckedChange = { enabled ->
-                                val err = Stealth.setEnabledReporting(enabled)
-                                if (err != null) {
-                                    android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
-                                } else {
-                                    stealthEnabled = enabled
-                                    Stealth.ensureLauncherVisible(context)
-                                    restartUiFresh(context)
+                                stealthEnabled = enabled
+                                scope.launch {
+                                    val err = withContext(Dispatchers.IO) {
+                                        val e = Stealth.setEnabledReporting(enabled)
+                                        if (e == null) Stealth.ensureLauncherVisible(context)
+                                        e
+                                    }
+                                    if (err != null) {
+                                        android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
+                                        stealthEnabled = !enabled
+                                    } else {
+                                        delay(300)
+                                        restartUiFresh(context)
+                                    }
                                 }
                             }
                         )

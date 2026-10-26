@@ -55,8 +55,13 @@ import me.li.coresu.ui.security.restartUiFresh
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import me.li.coresu.ui.util.BlurredBar
 import me.li.coresu.ui.util.rememberBlurBackdrop
 import top.yukonga.miuix.kmp.basic.Card
@@ -89,6 +94,7 @@ fun SettingPagerMiuix(
     val barColor = if (blurActive) Color.Transparent else colorScheme.surface
     val loadingDialog = rememberLoadingDialog()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var stealthEnabled by remember { mutableStateOf(Stealth.isEnabled()) }
     var stealthCode by remember { mutableStateOf(StealthCodeStore.effectiveCode(context)) }
     var showSecretDialog by remember { mutableStateOf(false) }
@@ -246,13 +252,20 @@ fun SettingPagerMiuix(
                                 },
                                 checked = stealthEnabled,
                                 onCheckedChange = { enabled ->
-                                    val err = Stealth.setEnabledReporting(enabled)
-                                    if (err != null) {
-                                        android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
-                                    } else {
-                                        stealthEnabled = enabled
-                                        Stealth.ensureLauncherVisible(context)
-                                        restartUiFresh(context)
+                                    stealthEnabled = enabled
+                                    scope.launch {
+                                        val err = withContext(Dispatchers.IO) {
+                                            val e = Stealth.setEnabledReporting(enabled)
+                                            if (e == null) Stealth.ensureLauncherVisible(context)
+                                            e
+                                        }
+                                        if (err != null) {
+                                            android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
+                                            stealthEnabled = !enabled
+                                        } else {
+                                            delay(300)
+                                            restartUiFresh(context)
+                                        }
                                     }
                                 }
                             )
