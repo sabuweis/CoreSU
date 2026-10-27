@@ -1,4 +1,4 @@
-name: Build Full CoreSU
+name: CoreSU
 on: workflow_dispatch
 jobs:
   build-lkm:
@@ -81,7 +81,18 @@ jobs:
           -PKEY_PASSWORD="${{ secrets.KEY_PASSWORD }}" \
           -PKSU_NAME=CoreSU -PKSU_PACKAGE_NAME=me.li.coresu
 
+    - name: Prepare Release Artifacts
+      run: |
+        # 1. 复制 APK 并重命名
+        cp manager/app/build/outputs/apk/release/*.apk CoreSU.apk
+        # 2. 打包纯净源码
+        git archive --format=zip --prefix=CoreSU/ HEAD -o CoreSU-source.zip
+        git archive --format=tar.gz --prefix=CoreSU/ HEAD -o CoreSU-source.tar.gz
+
     - uses: actions/upload-artifact@v4
       with:
-        name: CoreSU-APK
-        path: manager/app/build/outputs/apk/release/*.apk
+        name: CoreSU
+        path: |
+          CoreSU.apk
+          CoreSU-source.zip
+          CoreSU-source.tar.gz
