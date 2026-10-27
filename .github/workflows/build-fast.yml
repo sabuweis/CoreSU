@@ -57,10 +57,20 @@ jobs:
         git archive --format=zip --prefix=CoreSU/ HEAD -o CoreSU-source.zip
         git archive --format=tar.gz --prefix=CoreSU/ HEAD -o CoreSU-source.tar.gz
 
-    - uses: actions/upload-artifact@v4
+    - name: Upload CoreSU APK
+      uses: actions/upload-artifact@v4
       with:
-        name: CoreSU
-        path: |
-          CoreSU.apk
-          CoreSU-source.zip
-          CoreSU-source.tar.gz
+        name: CoreSU-APK
+        path: CoreSU.apk
+
+    - name: Upload Source ZIP
+      uses: actions/upload-artifact@v4
+      with:
+        name: CoreSU-Source-ZIP
+        path: CoreSU-source.zip
+
+    - name: Upload Source TAR.GZ
+      uses: actions/upload-artifact@v4
+      with:
+        name: CoreSU-Source-TAR-GZ
+        path: CoreSU-source.tar.gz
