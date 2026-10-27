@@ -60,17 +60,17 @@ jobs:
     - name: Upload CoreSU APK
       uses: actions/upload-artifact@v4
       with:
-        name: CoreSU-APK
+        name: CoreSU.apk
         path: CoreSU.apk
 
     - name: Upload Source ZIP
       uses: actions/upload-artifact@v4
       with:
-        name: CoreSU-Source-ZIP
+        name: Source code (zip)
         path: CoreSU-source.zip
 
     - name: Upload Source TAR.GZ
       uses: actions/upload-artifact@v4
       with:
-        name: CoreSU-Source-TAR-GZ
+        name: Source code (tar.gz)
         path: CoreSU-source.tar.gz
