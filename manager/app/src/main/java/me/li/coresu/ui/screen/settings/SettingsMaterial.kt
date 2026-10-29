@@ -169,44 +169,6 @@ fun SettingPagerMaterial(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 13.dp),
                 content = buildList {
 
-                    add {
-                        SegmentedSwitchItem(
-                            icon = Icons.Filled.VerifiedUser,
-                            title = "隐身模式",
-                            summary = "界面伪装成未安装，超级用户/模块等页面全部隐藏",
-                            checked = stealthEnabled,
-                            onCheckedChange = { enabled ->
-                                stealthEnabled = enabled
-                                scope.launch {
-                                    val err = withContext(Dispatchers.IO) {
-                                        val e = Stealth.setEnabledReporting(enabled)
-                                        if (e == null) Stealth.ensureLauncherVisible(context)
-                                        e
-                                    }
-                                    if (err != null) {
-                                        android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
-                                        stealthEnabled = !enabled
-                                    } else {
-                                        delay(300)
-                                        restartUiFresh(context)
-                                    }
-                                }
-                            }
-                        )
-                    }
-                    add {
-                        SegmentedListItem(
-                            onClick = {
-                                secretInput = stealthCode
-                                showSecretKeyDialog = true
-                            },
-                            headlineContent = { Text("超级密钥") },
-                            supportingContent = { Text("用于在隐身模式下紧急呼出管理界面") },
-                            leadingContent = { Icon(Icons.Filled.Key, "超级密钥") },
-                            trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) }
-                        )
-                    }
-
 
                     add {
                         SegmentedDropdownItem(
@@ -257,6 +219,48 @@ fun SettingPagerMaterial(
             }
 
             KsuIsValid {
+                        SegmentedColumn(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 13.dp),
+            content = listOf(
+                {
+                    SegmentedSwitchItem(
+                        icon = Icons.Filled.VerifiedUser,
+                        title = "隐身模式",
+                        summary = "界面伪装成未安装，超级用户/模块等页面全部隐藏",
+                        checked = stealthEnabled,
+                        onCheckedChange = { enabled ->
+                            stealthEnabled = enabled
+                            scope.launch {
+                                val err = withContext(Dispatchers.IO) {
+                                    val e = Stealth.setEnabledReporting(enabled)
+                                    if (e == null) Stealth.ensureLauncherVisible(context)
+                                    e
+                                }
+                                if (err != null) {
+                                    android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
+                                    stealthEnabled = !enabled
+                                } else {
+                                    delay(300)
+                                    restartUiFresh(context)
+                                }
+                            }
+                        }
+                    )
+                },
+                {
+                    SegmentedListItem(
+                        onClick = {
+                            secretInput = stealthCode
+                            showSecretKeyDialog = true
+                        },
+                        headlineContent = { Text("超级密钥") },
+                        supportingContent = { Text("用于在隐身模式下紧急呼出管理界面") },
+                        leadingContent = { Icon(Icons.Filled.Key, "超级密钥") },
+                        trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) }
+                    )
+                }
+            )
+        )
                 val suCompatModeItems = listOf(
                     stringResource(id = R.string.settings_mode_enable_by_default),
                     stringResource(id = R.string.settings_mode_disable_until_reboot),
