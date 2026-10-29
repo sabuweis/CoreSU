@@ -10,7 +10,7 @@ object Stealth {
     private const val LAUNCHER_ALIAS = "me.li.coresu.ui.LauncherAlias"
     private const val UAPI_WITH_STEALTH = 5
 
-    const val STEALTH_FLAG_PATH = "/data/adb/csu/stealth"
+    const val STEALTH_FLAG_PATH = "/data/adb/ksu/stealth"
 
     fun kernelState(): Int = runCatching { Natives.stealthState() }.getOrDefault(-1)
 

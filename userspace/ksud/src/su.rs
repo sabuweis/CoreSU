@@ -32,7 +32,7 @@ pub fn grant_root(global_mnt: bool) -> Result<()> {
             Result::Ok(())
         })
     };
-    // add /data/adb/csu/bin to PATH
+    // add /data/adb/ksu/bin to PATH
     add_path_to_env(defs::BINARY_DIR)?;
     Err(command.exec().into())
 }
@@ -315,7 +315,7 @@ pub fn root_shell() -> Result<()> {
         }
     }
 
-    // add /data/adb/csu/bin to PATH
+    // add /data/adb/ksu/bin to PATH
     add_path_to_env(defs::BINARY_DIR)?;
 
     // when KSURC_PATH exists and ENV is not set, set ENV to KSURC_PATH

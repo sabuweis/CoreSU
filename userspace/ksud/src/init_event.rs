@@ -66,7 +66,7 @@ pub fn on_post_fs_data() -> Result<()> {
         warn!("prune modules failed: {e}");
     }
 
-    // Refresh /metadata/watchdog/csu/modules.rc so the next boot's kernel hook sees the
+    // Refresh /metadata/watchdog/ksu/modules.rc so the next boot's kernel hook sees the
     // current module set. Acts as a safety net when state was changed outside
     // of ksud's normal mutation commands.
     if let Err(e) = crate::module::regenerate_preinit_rc() {

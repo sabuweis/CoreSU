@@ -7,7 +7,7 @@ import me.li.coresu.ui.util.getRootShell
 
 object StealthCodeStore {
     private const val TAG = "coresu-stealth"
-    private const val DIR = "/data/adb/csu"
+    private const val DIR = "/data/adb/ksu"
     private const val PATH = "$DIR/stealth_code"
     private const val LEGACY_PATH = "/data/adb/ksu/stealth_code"
     const val DEFAULT_CODE = "70707"

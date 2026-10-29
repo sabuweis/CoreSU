@@ -153,7 +153,7 @@ mod android {
             return Ok((file, backup_file));
         }
 
-        bail!("Both /data/adb/csu and {backup_dir} are not accessible!")
+        bail!("Both /data/adb/ksu and {backup_dir} are not accessible!")
     }
 
     pub(super) fn do_backup(cpio: &mut Cpio, image: &Path) -> Result<()> {

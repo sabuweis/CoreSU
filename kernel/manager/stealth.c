@@ -4,7 +4,7 @@
  *
  *   开启后,内核在 GET_INFO 时不再向管理器 App 上报 KSU_GET_INFO_FLAG_MANAGER,
  *   于是 App 认为 is_manager == false,整个界面伪装成"未安装"。
- *   状态持久化在 /data/adb/csu/stealth,内容为 '0' / '1'。
+ *   状态持久化在 /data/adb/ksu/stealth,内容为 '0' / '1'。
  */
 #include <linux/types.h>
 #include <linux/err.h>
@@ -18,7 +18,7 @@
 #include "ksu.h"
 #include "klog.h"
 
-#define KSU_STEALTH_PATH "/data/adb/csu/stealth"
+#define KSU_STEALTH_PATH "/data/adb/ksu/stealth"
 
 static bool ksu_stealth_enabled;
 static bool ksu_stealth_loaded;

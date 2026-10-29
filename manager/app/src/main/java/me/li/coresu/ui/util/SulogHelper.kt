@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter
 import java.util.ArrayDeque
 import java.util.Locale
 
-private const val SULOG_DIR = "/data/adb/csu/log"
+private const val SULOG_DIR = "/data/adb/ksu/log"
 private const val SULOG_LINE_LIMIT = 1000
 private const val SULOG_FILE_PREFIX = "sulog-"
 private const val SULOG_FILE_SUFFIX = ".log"

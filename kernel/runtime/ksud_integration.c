@@ -189,8 +189,8 @@ static ssize_t ksu_rc_pos = 0;
 const size_t ksu_rc_len = sizeof(KERNEL_SU_RC) - 1;
 
 // Prefer /metadata/watchdog/ when present, else /metadata.
-#define MODULE_RC_PATH_WATCHDOG "/metadata/watchdog/csu/modules.rc"
-#define MODULE_RC_PATH_DEFAULT "/metadata/csu/modules.rc"
+#define MODULE_RC_PATH_WATCHDOG "/metadata/watchdog/ksu/modules.rc"
+#define MODULE_RC_PATH_DEFAULT "/metadata/ksu/modules.rc"
 static char *module_rc_buf;
 static size_t module_rc_len;
 static ssize_t module_rc_pos;

@@ -46,7 +46,7 @@ static long is_exec_adbd(const char __user *filename_user)
 
 static long is_libadbroot_ok()
 {
-    static const char kLibAdbRoot[] = "/data/adb/csu/lib/libadbroot.so";
+    static const char kLibAdbRoot[] = "/data/adb/ksu/lib/libadbroot.so";
     struct path path;
     long ret = kern_path(kLibAdbRoot, 0, &path);
     if (ret < 0) {
@@ -66,8 +66,8 @@ static long is_libadbroot_ok()
 
 static long setup_ld_preload(struct pt_regs *regs, unsigned long *envp_p)
 {
-    static const char kLdPreload[] = "LD_PRELOAD=/data/adb/csu/lib/libadbroot.so";
-    static const char kLdLibraryPath[] = "LD_LIBRARY_PATH=/data/adb/csu/lib";
+    static const char kLdPreload[] = "LD_PRELOAD=/data/adb/ksu/lib/libadbroot.so";
+    static const char kLdLibraryPath[] = "LD_LIBRARY_PATH=/data/adb/ksu/lib";
     static const size_t kReadEnvBatch = 16;
     static const size_t kPtrSize = sizeof(unsigned long);
     unsigned long stackp = user_stack_pointer(regs);
