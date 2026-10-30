@@ -72,7 +72,7 @@ print_title() {
 }
 
 check_sepolicy() {
-    /data/adb/csud sepolicy check "$1"
+    /data/adb/ksud sepolicy check "$1"
     return $?
 }
 
@@ -267,7 +267,7 @@ check_managed_features() {
     [ -z "$feature" ] && continue
 
     # Check feature status using ksud
-    local status=$(/data/adb/csud feature check "$feature" 2>/dev/null)
+    local status=$(/data/adb/ksud feature check "$feature" 2>/dev/null)
 
     case "$status" in
       "unsupported")
