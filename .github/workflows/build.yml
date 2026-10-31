@@ -1,0 +1,28 @@
+name: Build SukiSU-Ultra Liquid Glass
+on:
+  push:
+    branches: [feat/liquid-glass]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Accept licenses
+        run: yes | sdkmanager --licenses || true
+      - run: chmod +x manager/gradlew
+      - run: cd manager && ./gradlew :app:assembleDebug --no-daemon --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sukisu-liquid-glass-debug
+          path: manager/app/build/outputs/apk/debug/*.apk

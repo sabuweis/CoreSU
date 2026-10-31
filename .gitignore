@@ -1,0 +1,11 @@
+**/build/
+**/.gradle/
+**/local.properties
+**/.idea/
+**/.cxx/
+**/captures/
+**/target/
+**/node_modules/
+**/*.bak
+.git.original/
+.actions/
