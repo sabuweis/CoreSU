@@ -241,7 +241,7 @@ fun SettingPagerMaterial(
                                     stealthEnabled = !enabled
                                 } else {
                                     delay(300)
-                                    // 移除卡顿的重启
+                                    restartUiFresh(context)
                                 }
                             }
                         }
