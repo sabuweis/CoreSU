@@ -131,6 +131,12 @@ class MainActivity : ComponentActivity() {
         val isManager = Natives.isManager
         if (isManager && Natives.kernelUAPIVersion == Natives.managerUAPIVersion) install()
 
+        // 核心修复：这里没有使用 uiState，而是直接去读本地的配置
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val enablePredictive = me.li.coresu.data.repository.SettingsRepositoryImpl().enablePredictiveBack
+            me.li.coresu.KernelSUApplication.setEnableOnBackInvokedCallback(applicationInfo, enablePredictive)
+        }
+
         // 直接读取配置并应用，确保杀后台冷启动立即生效
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             val enablePredictive = me.li.coresu.data.repository.SettingsRepositoryImpl().enablePredictiveBack
