@@ -41,10 +41,7 @@ class KernelSUApplication : Application(), ViewModelStoreOwner {
         super.onCreate()
         ksuApp = this
 
-        if (!isUserUnlocked()) {
-            return
-        }
-
+        // 移除冷启动锁定拦截，防止杀后台后手势失效
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             val enable = SettingsRepositoryImpl().enablePredictiveBack
             HiddenApiBypass.addHiddenApiExemptions("Landroid/content/pm/ApplicationInfo;->setEnableOnBackInvokedCallback")

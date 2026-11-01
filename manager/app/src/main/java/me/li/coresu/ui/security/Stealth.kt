@@ -59,10 +59,11 @@ object Stealth {
 
 fun restartUiFresh(context: Context) {
     val activity = context.findActivity()
-    (activity as? androidx.lifecycle.ViewModelStoreOwner)?.let {
-        runCatching { it.viewModelStore.clear() }
-    }
-    activity?.recreate()
+    // 移除会导致卡死的 viewModelStore.clear()
+    // 使用 Handler 延迟执行 recreate，给开关动画留出时间
+    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+        activity?.recreate()
+    }, 250)
 }
 
 tailrec fun Context.findActivity(): Activity? = when (this) {

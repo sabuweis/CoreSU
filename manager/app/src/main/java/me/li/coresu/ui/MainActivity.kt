@@ -141,6 +141,14 @@ class MainActivity : ComponentActivity() {
             val uiMode = uiState.uiMode
             val darkMode = appSettings.colorMode.isDark || (appSettings.colorMode.isSystem && isSystemInDarkTheme())
 
+            // 监听预测性返回手势状态，实时生效，不卡顿
+            LaunchedEffect(uiState.enablePredictiveBack) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    org.lsposed.hiddenapibypass.HiddenApiBypass.addHiddenApiExemptions("Landroid/content/pm/ApplicationInfo;->setEnableOnBackInvokedCallback")
+                    KernelSUApplication.setEnableOnBackInvokedCallback(applicationContext.applicationInfo, uiState.enablePredictiveBack)
+                }
+            }
+
             DisposableEffect(darkMode) {
                 enableEdgeToEdge(
                     statusBarStyle = SystemBarStyle.auto(
