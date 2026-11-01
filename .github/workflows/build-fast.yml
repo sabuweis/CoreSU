@@ -60,7 +60,7 @@ jobs:
     - name: Upload CoreSU APK
       uses: actions/upload-artifact@v4
       with:
-        name: CoreSU.apk
+        name: CoreSU
         path: CoreSU.apk
 
     - name: Upload Source ZIP

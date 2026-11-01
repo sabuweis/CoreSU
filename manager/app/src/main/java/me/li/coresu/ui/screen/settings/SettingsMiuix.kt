@@ -264,7 +264,7 @@ fun SettingPagerMiuix(
                                             stealthEnabled = !enabled
                                         } else {
                                             delay(300)
-                                            restartUiFresh(context)
+                                            // 移除卡顿的重启
                                         }
                                     }
                                 }
