@@ -263,8 +263,7 @@ fun SettingPagerMiuix(
                                             android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
                                             stealthEnabled = !enabled
                                         } else {
-                                            delay(300)
-                                            restartUiFresh(context)
+                                            // 已移除卡顿的重建
                                         }
                                     }
                                 }
