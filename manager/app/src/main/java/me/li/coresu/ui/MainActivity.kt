@@ -131,6 +131,12 @@ class MainActivity : ComponentActivity() {
         val isManager = Natives.isManager
         if (isManager && Natives.kernelUAPIVersion == Natives.managerUAPIVersion) install()
 
+        // 直接读取配置并应用，确保杀后台冷启动立即生效
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val enablePredictive = me.li.coresu.data.repository.SettingsRepositoryImpl().enablePredictiveBack
+            me.li.coresu.KernelSUApplication.setEnableOnBackInvokedCallback(applicationInfo, enablePredictive)
+        }
+
         // 核心修复：每次 Activity 创建时，实时应用预测性返回手势，杀后台重开也绝对不失效
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             val enablePredictive = me.li.coresu.data.repository.SettingsRepositoryImpl().enablePredictiveBack
