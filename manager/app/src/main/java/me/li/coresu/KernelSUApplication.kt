@@ -8,7 +8,6 @@ import android.system.Os
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
-import me.li.coresu.data.repository.PredictiveBackPrefs
 import me.li.coresu.data.repository.SettingsRepositoryImpl
 import me.li.coresu.ui.viewmodel.SuperUserViewModel
 import okhttp3.Cache

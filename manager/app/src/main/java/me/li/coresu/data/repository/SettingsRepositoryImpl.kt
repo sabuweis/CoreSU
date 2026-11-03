@@ -8,7 +8,6 @@ import androidx.core.content.edit
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamiccolor.ColorSpec
 import com.topjohnwu.superuser.ShellUtils
-import me.li.coresu.KernelSUApplication
 import me.li.coresu.Natives
 import me.li.coresu.ksuApp
 import me.li.coresu.magica.BootCompletedReceiver
@@ -77,9 +76,7 @@ class SettingsRepositoryImpl : SettingsRepository {
             // commit=true：杀后台瞬间也不会丢写入（apply 是异步落盘）
             prefs.edit(commit = true) { putBoolean("enable_predictive_back", value) }
             // 同步到 DE 存储，保证下次进程启动（含锁屏直启）能立即应用
-            PredictiveBackPrefs.write(ksuApp, value)
-            KernelSUApplication.setEnableOnBackInvokedCallback(ksuApp.applicationInfo, value)
-        }
+            }
 
     override var enableSwipeDismiss: Boolean
         get() = prefs.getBoolean("enable_swipe_dismiss", true)
