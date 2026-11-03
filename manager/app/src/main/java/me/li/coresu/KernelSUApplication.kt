@@ -48,12 +48,7 @@ class KernelSUApplication : Application(), ViewModelStoreOwner {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             runCatching {
                 // 锁屏/直启时 CE 存储不可读，改读 DE 副本，避免冷启动静默失效
-                val enable = if (isUserUnlocked()) {
-                    SettingsRepositoryImpl().enablePredictiveBack
-                        .also { PredictiveBackPrefs.write(this, it) }
-                } else {
-                    PredictiveBackPrefs.read(this)
-                }
+                val enable = SettingsRepositoryImpl().enablePredictiveBack
                 setEnableOnBackInvokedCallback(applicationInfo, enable)
             }
         }
