@@ -8,6 +8,7 @@ import android.system.Os
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import me.li.coresu.data.repository.PredictiveBackPrefs
 import me.li.coresu.data.repository.SettingsRepositoryImpl
 import me.li.coresu.ui.viewmodel.SuperUserViewModel
 import okhttp3.Cache
@@ -22,7 +23,9 @@ class KernelSUApplication : Application(), ViewModelStoreOwner {
 
     companion object {
         fun setEnableOnBackInvokedCallback(appInfo: ApplicationInfo, enable: Boolean) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
             runCatching {
+                HiddenApiBypass.addHiddenApiExemptions("Landroid/content/pm/ApplicationInfo;->setEnableOnBackInvokedCallback")
                 val applicationInfoClass = ApplicationInfo::class.java
                 val method = applicationInfoClass.getDeclaredMethod("setEnableOnBackInvokedCallback", Boolean::class.javaPrimitiveType)
                 method.isAccessible = true
@@ -44,8 +47,13 @@ class KernelSUApplication : Application(), ViewModelStoreOwner {
         // 预测性返回必须在任何 Activity 窗口创建前应用，否则只走旧版返回（无动画）
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             runCatching {
-                val enable = SettingsRepositoryImpl().enablePredictiveBack
-                HiddenApiBypass.addHiddenApiExemptions("Landroid/content/pm/ApplicationInfo;->setEnableOnBackInvokedCallback")
+                // 锁屏/直启时 CE 存储不可读，改读 DE 副本，避免冷启动静默失效
+                val enable = if (isUserUnlocked()) {
+                    SettingsRepositoryImpl().enablePredictiveBack
+                        .also { PredictiveBackPrefs.write(this, it) }
+                } else {
+                    PredictiveBackPrefs.read(this)
+                }
                 setEnableOnBackInvokedCallback(applicationInfo, enable)
             }
         }
