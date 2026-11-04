@@ -54,10 +54,8 @@ fun ColorPaletteScreen() {
         onSetEnablePredictiveBack = { enabled ->
             viewModel.setEnablePredictiveBack(enabled)
             KernelSUApplication.setEnableOnBackInvokedCallback(context.applicationInfo, enabled)
-            // 核心：延迟 300ms 再重建，让开关动画彻底播完，绝不卡顿
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                activity?.recreate()
-            }, 300)
+            activity?.recreate()
+        }, 300)
         },
         onSetEnableSwipeDismiss = viewModel::setEnableSwipeDismiss,
         onSetPagerInterceptionMode = viewModel::setPagerInterceptionMode,

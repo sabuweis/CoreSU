@@ -43,6 +43,16 @@ class KernelSUApplication : Application(), ViewModelStoreOwner {
         super.onCreate()
         ksuApp = this
 
+        if (!isUserUnlocked()) {
+            return
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val enable = SettingsRepositoryImpl().enablePredictiveBack
+            HiddenApiBypass.addHiddenApiExemptions("Landroid/content/pm/ApplicationInfo;->setEnableOnBackInvokedCallback")
+            setEnableOnBackInvokedCallback(applicationInfo, enable)
+        }
+
         // 预测性返回必须在任何 Activity 窗口创建前应用，否则只走旧版返回（无动画）
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             runCatching {
