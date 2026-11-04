@@ -1,5 +1,7 @@
 package me.li.coresu.ui.screen.colorpalette
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -16,6 +18,8 @@ import me.li.coresu.ui.viewmodel.SettingsViewModel
 
 @Composable
 fun ColorPaletteScreen() {
+    val activity = LocalActivity.current
+    val context = LocalContext.current
     val navigator = LocalNavigator.current
     val viewModel = viewModel<SettingsViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
