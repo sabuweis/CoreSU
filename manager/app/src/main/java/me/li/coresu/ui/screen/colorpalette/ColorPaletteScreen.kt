@@ -55,7 +55,6 @@ fun ColorPaletteScreen() {
             viewModel.setEnablePredictiveBack(enabled)
             KernelSUApplication.setEnableOnBackInvokedCallback(context.applicationInfo, enabled)
             activity?.recreate()
-        }, 300)
         },
         onSetEnableSwipeDismiss = viewModel::setEnableSwipeDismiss,
         onSetPagerInterceptionMode = viewModel::setPagerInterceptionMode,
