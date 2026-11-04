@@ -7,6 +7,7 @@ import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamiccolor.ColorSpec
+import me.li.coresu.KernelSUApplication
 import me.li.coresu.ui.LocalUiMode
 import me.li.coresu.ui.UiMode
 import me.li.coresu.ui.navigation3.LocalNavigator
@@ -46,7 +47,14 @@ fun ColorPaletteScreen() {
         onSetEnableFloatingBottomBar = viewModel::setEnableFloatingBottomBar,
         onSetEnableFloatingBottomBarBlur = viewModel::setEnableFloatingBottomBarBlur,
         onSetEnableNavigationBadge = viewModel::setEnableNavigationBadge,
-        onSetEnablePredictiveBack = viewModel::setEnablePredictiveBack,
+        onSetEnablePredictiveBack = { enabled ->
+            viewModel.setEnablePredictiveBack(enabled)
+            KernelSUApplication.setEnableOnBackInvokedCallback(context.applicationInfo, enabled)
+            // 核心：延迟 300ms 再重建，让开关动画彻底播完，绝不卡顿
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                activity?.recreate()
+            }, 300)
+        },
         onSetEnableSwipeDismiss = viewModel::setEnableSwipeDismiss,
         onSetPagerInterceptionMode = viewModel::setPagerInterceptionMode,
         onSetPageScale = viewModel::setPageScale,
