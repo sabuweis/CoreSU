@@ -22,9 +22,7 @@ class KernelSUApplication : Application(), ViewModelStoreOwner {
 
     companion object {
         fun setEnableOnBackInvokedCallback(appInfo: ApplicationInfo, enable: Boolean) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
             runCatching {
-                HiddenApiBypass.addHiddenApiExemptions("Landroid/content/pm/ApplicationInfo;->setEnableOnBackInvokedCallback")
                 val applicationInfoClass = ApplicationInfo::class.java
                 val method = applicationInfoClass.getDeclaredMethod("setEnableOnBackInvokedCallback", Boolean::class.javaPrimitiveType)
                 method.isAccessible = true
@@ -43,16 +41,14 @@ class KernelSUApplication : Application(), ViewModelStoreOwner {
         super.onCreate()
         ksuApp = this
 
-        // 重构核心：强行在拦截前应用手势，用 runCatching 保底，彻底解决杀后台失效
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            runCatching {
-                val enable = SettingsRepositoryImpl().enablePredictiveBack
-                setEnableOnBackInvokedCallback(applicationInfo, enable)
-            }
-        }
-
         if (!isUserUnlocked()) {
             return
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val enable = SettingsRepositoryImpl().enablePredictiveBack
+            HiddenApiBypass.addHiddenApiExemptions("Landroid/content/pm/ApplicationInfo;->setEnableOnBackInvokedCallback")
+            setEnableOnBackInvokedCallback(applicationInfo, enable)
         }
 
         val superUserViewModel = ViewModelProvider(this)[SuperUserViewModel::class.java]

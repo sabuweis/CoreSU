@@ -220,10 +220,8 @@ class SettingsViewModel(
     }
 
     fun setEnablePredictiveBack(enabled: Boolean) {
+        repo.enablePredictiveBack = enabled
         _uiState.update { it.copy(enablePredictiveBack = enabled) }
-        viewModelScope.launch(Dispatchers.IO) {
-            repo.enablePredictiveBack = enabled
-        }
     }
 
     fun setEnableSwipeDismiss(enabled: Boolean) {

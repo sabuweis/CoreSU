@@ -1,9 +1,9 @@
 package me.li.coresu.ui.screen.colorpalette
 
-import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,9 +18,9 @@ import me.li.coresu.ui.viewmodel.SettingsViewModel
 
 @Composable
 fun ColorPaletteScreen() {
-    val activity = LocalActivity.current
-    val context = LocalContext.current
     val navigator = LocalNavigator.current
+    val context = LocalContext.current
+    val activity = LocalActivity.current
     val viewModel = viewModel<SettingsViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val currentPaletteStyle = try {
@@ -51,13 +51,10 @@ fun ColorPaletteScreen() {
         onSetEnableFloatingBottomBar = viewModel::setEnableFloatingBottomBar,
         onSetEnableFloatingBottomBarBlur = viewModel::setEnableFloatingBottomBarBlur,
         onSetEnableNavigationBadge = viewModel::setEnableNavigationBadge,
-        onSetEnablePredictiveBack = { enabled ->
-            viewModel.setEnablePredictiveBack(enabled)
-            KernelSUApplication.setEnableOnBackInvokedCallback(context.applicationInfo, enabled)
-            // 原版是直接 recreate 的，这里加 50ms 极短延迟，既消灭了卡顿，又保留了立刻生效
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                activity?.recreate()
-            }, 50)
+        onSetEnablePredictiveBack = {
+            viewModel.setEnablePredictiveBack(it)
+            KernelSUApplication.setEnableOnBackInvokedCallback(context.applicationInfo, it)
+            activity?.recreate()
         },
         onSetEnableSwipeDismiss = viewModel::setEnableSwipeDismiss,
         onSetPagerInterceptionMode = viewModel::setPagerInterceptionMode,
