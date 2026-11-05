@@ -71,7 +71,7 @@ class SettingsRepositoryImpl : SettingsRepository {
 
     override var enablePredictiveBack: Boolean
         get() = prefs.getBoolean("enable_predictive_back", false)
-        set(value) = prefs.edit { putBoolean("enable_predictive_back", value) }
+        set(value) = prefs.edit(commit = true) { putBoolean("enable_predictive_back", value) }
 
     override var enableSwipeDismiss: Boolean
         get() = prefs.getBoolean("enable_swipe_dismiss", true)
