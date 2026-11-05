@@ -372,7 +372,11 @@ pub fn load_module(data: &[u8], params: &CStr) -> Result<()> {
 
             let Some(required_vermagic) = extract_required_vermagic(&logs) else {
                 log::error!("Kernel module loading log:\n{}", logs);
-                return Err(first_error).context("init_module failed without vermagic mismatch");
+                // Attach the kernel-side log to the error as well: in late-load mode the only
+                // consumer may be a caller capturing stderr, where logcat output never lands.
+                return Err(first_error).with_context(|| {
+                    format!("init_module failed without vermagic mismatch:\n{logs}")
+                });
             };
 
             log::warn!(
@@ -383,7 +387,16 @@ pub fn load_module(data: &[u8], params: &CStr) -> Result<()> {
             replace_module_vermagic(&mut buffer, &required_vermagic)
                 .context("Cannot replace module vermagic")?;
 
-            init_module(&buffer, params).context("init_module failed after replacing vermagic")?;
+            if let Err(error) = init_module(&buffer, params) {
+                let logs = match kmsg.as_mut() {
+                    Some(file) => read_new_kmsg(file).unwrap_or_default(),
+                    None => String::new(),
+                };
+                log::error!("Kernel module loading log after vermagic replace:\n{logs}");
+                return Err(error).with_context(|| {
+                    format!("init_module failed after replacing vermagic:\n{logs}")
+                });
+            }
             Ok(())
         }
     }

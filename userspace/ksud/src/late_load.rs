@@ -36,13 +36,13 @@ fn dump_process_info(label: &str) {
 }
 
 pub fn run(package_name: &String, kmi: Option<String>, allow_shell: bool) -> Result<()> {
-    utils::daemonize(false)?;
     info!("late-load command triggered!");
     dump_process_info("late-load start");
 
     // 1. Check if KernelSU is already loaded
     if ksuinit::has_kernelsu() {
         info!("KernelSU already loaded, skip loading ko");
+        eprintln!("[*] KernelSU already loaded, skip loading ko");
     } else {
         // 2. Detect current KMI version
         let kmi = kmi.map_or_else(
@@ -64,10 +64,21 @@ pub fn run(package_name: &String, kmi: Option<String>, allow_shell: bool) -> Res
         } else {
             cstr!("")
         };
-        ksuinit::load_module(&ko_data, params).context("Failed to load kernelsu.ko")?;
+        let load = ksuinit::load_module(&ko_data, params);
+        if let Err(e) = &load {
+            eprintln!("[-] init_module for {ko_name} failed: {e:#}");
+        }
+        load.context("Failed to load kernelsu.ko")?;
         info!("kernelsu.ko loaded successfully!");
+        eprintln!("[+] {ko_name} loaded for KMI {kmi}");
         dump_process_info("after load_module");
     }
+
+    // Detach only after the module is loaded: daemonize() forks and lets the original process
+    // exit with status 0 immediately, so a failure before this point would be reported to the
+    // caller (jailbreak script / exploit shell) as a success while the real error stayed in
+    // logcat. Stage scripts below still need to outlive the caller, hence the late detach.
+    utils::daemonize(false)?;
 
     // We need to reset stdin/stdout/stderr; otherwise, sending file descriptors via cmd transactions
     // will be blocked by SELinux because its fsec->sid is still u:r:su:s0 instead of u:r:ksu:s0.
