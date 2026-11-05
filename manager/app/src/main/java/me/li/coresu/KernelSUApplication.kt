@@ -22,7 +22,9 @@ class KernelSUApplication : Application(), ViewModelStoreOwner {
 
     companion object {
         fun setEnableOnBackInvokedCallback(appInfo: ApplicationInfo, enable: Boolean) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
             runCatching {
+                HiddenApiBypass.addHiddenApiExemptions("Landroid/content/pm/ApplicationInfo;->setEnableOnBackInvokedCallback")
                 val applicationInfoClass = ApplicationInfo::class.java
                 val method = applicationInfoClass.getDeclaredMethod("setEnableOnBackInvokedCallback", Boolean::class.javaPrimitiveType)
                 method.isAccessible = true
@@ -41,12 +43,7 @@ class KernelSUApplication : Application(), ViewModelStoreOwner {
         super.onCreate()
         ksuApp = this
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            runCatching {
-                val enable = SettingsRepositoryImpl().isPredictiveBackEnabledForBoot()
-                setEnableOnBackInvokedCallback(applicationInfo, enable)
-            }
-        }
+        // 纯净版：移除了所有强加的手势注册，完全交由 MainActivity 负责
 
         if (!isUserUnlocked()) {
             return

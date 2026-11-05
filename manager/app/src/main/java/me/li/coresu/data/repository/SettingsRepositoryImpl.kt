@@ -22,7 +22,6 @@ import java.security.SecureRandom
 private const val SETTINGS_PREFS = "settings"
 private const val KEY_USE_SOFT_REBOOT = "soft_reboot"
 
-/** Prefer soft reboot: always in jailbreak mode, or when the setting is enabled. */
 fun isSoftRebootPreferred(): Boolean =
     Natives.isLateLoadMode || ksuApp.getSharedPreferences(SETTINGS_PREFS, Context.MODE_PRIVATE)
         .getBoolean(KEY_USE_SOFT_REBOOT, false)
@@ -72,11 +71,7 @@ class SettingsRepositoryImpl : SettingsRepository {
 
     override var enablePredictiveBack: Boolean
         get() = prefs.getBoolean("enable_predictive_back", false)
-        set(value) {
-            // commit=true：杀后台瞬间也不会丢写入（apply 是异步落盘）
-            prefs.edit(commit = true) { putBoolean("enable_predictive_back", value) }
-            // 同步到 DE 存储，保证下次进程启动（含锁屏直启）能立即应用
-            }
+        set(value) = prefs.edit { putBoolean("enable_predictive_back", value) }
 
     override var enableSwipeDismiss: Boolean
         get() = prefs.getBoolean("enable_swipe_dismiss", true)
@@ -188,67 +183,41 @@ class SettingsRepositoryImpl : SettingsRepository {
     }
 
     override suspend fun getSuCompatStatus(): String = getFeatureStatus("su_compat")
-
     override suspend fun getSuCompatPersistValue(): Long? = getFeaturePersistValue("su_compat")
-
     override fun isSuEnabled(): Boolean = Natives.isSuEnabled()
-
     override fun setSuEnabled(enabled: Boolean): Boolean = Natives.setSuEnabled(enabled)
-
     override fun setSuCompatModePref(mode: Int) = prefs.edit { putInt("su_compat_mode", mode) }
-
     override fun getSuCompatModePref(): Int = prefs.getInt("su_compat_mode", 0)
 
     override suspend fun getKernelUmountStatus(): String = getFeatureStatus("kernel_umount")
-
     override fun isKernelUmountEnabled(): Boolean = Natives.isKernelUmountEnabled()
-
     override fun setKernelUmountEnabled(enabled: Boolean): Boolean = Natives.setKernelUmountEnabled(enabled)
 
     override suspend fun getSelinuxHideStatus(): String = getFeatureStatus("selinux_hide")
-
     override fun isSelinuxHideEnabled(): Boolean = Natives.isSelinuxHideEnabled()
-
     override fun setSelinuxHideEnabled(enabled: Boolean): Int = Natives.setSelinuxHideEnabled(enabled)
 
     override suspend fun getSulogStatus(): String = getFeatureStatus("sulog")
-
     override suspend fun getSulogPersistValue(): Long? = getFeaturePersistValue("sulog")
-
     override suspend fun getSulogValue(): Long? = getFeatureValue("sulog")
-
     override fun setSulogEnabled(enabled: Boolean): Boolean = execKsud("feature set sulog ${if (enabled) 1 else 0}", true)
 
     override suspend fun getAdbRootStatus(): String = getFeatureStatus("adb_root")
-
     override suspend fun getAdbRootPersistValue(): Long? = getFeaturePersistValue("adb_root")
-
     override suspend fun getAdbRootValue(): Long? = getFeatureValue("adb_root")
-
     override fun setAdbRootEnabled(enabled: Boolean): Boolean =
         if (execKsud("feature set adb_root ${if (enabled) 1 else 0}", true)) {
             ShellUtils.fastCmd("setprop ctl.restart adbd")
             true
-        } else {
-            false
-        }
+        } else false
 
     override suspend fun getShellSuAdbOnlyStatus(): String = getFeatureStatus("shell_su_adb_only")
-
     override suspend fun getShellSuAdbOnlyPersistValue(): Long? = getFeaturePersistValue("shell_su_adb_only")
-
     override suspend fun getShellSuAdbOnlyValue(): Long? = getFeatureValue("shell_su_adb_only")
-
-    override fun setShellSuAdbOnlyEnabled(enabled: Boolean): Boolean =
-        execKsud("feature set shell_su_adb_only ${if (enabled) 1 else 0}", true)
+    override fun setShellSuAdbOnlyEnabled(enabled: Boolean): Boolean = execKsud("feature set shell_su_adb_only ${if (enabled) 1 else 0}", true)
 
     override fun isDefaultUmountModules(): Boolean = Natives.isDefaultUmountModules()
-
     override fun setDefaultUmountModules(enabled: Boolean): Boolean = Natives.setDefaultUmountModules(enabled)
-
     override fun isLkmMode(): Boolean = Natives.isLkmMode
-
-    override fun execKsudFeatureSave() {
-        execKsud("feature save", true)
-    }
+    override fun execKsudFeatureSave() { execKsud("feature save", true) }
 }
