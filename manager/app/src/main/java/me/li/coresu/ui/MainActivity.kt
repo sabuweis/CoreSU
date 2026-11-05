@@ -124,6 +124,15 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         splashStartedAt = SystemClock.uptimeMillis()
         super.onCreate(savedInstanceState)
+
+        // 核心修复：无论杀后台还是冷启动，Activity 一出来就强行读取配置并应用手势！
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            runCatching {
+                val enable = me.li.coresu.data.repository.SettingsRepositoryImpl().enablePredictiveBack
+                me.li.coresu.KernelSUApplication.setEnableOnBackInvokedCallback(applicationInfo, enable)
+            }
+        }
+
         splashScreen.setKeepOnScreenCondition {
             !contentReady || SystemClock.uptimeMillis() - splashStartedAt < splashAnimationDurationMs
         }
