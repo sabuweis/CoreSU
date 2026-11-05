@@ -38,6 +38,14 @@ class SettingsRepositoryImpl : SettingsRepository {
         ksuApp.getSharedPreferences(SETTINGS_PREFS, Context.MODE_PRIVATE)
     }
 
+    private val dePrefs by lazy {
+        ksuApp.createDeviceProtectedStorageContext().getSharedPreferences(SETTINGS_PREFS, Context.MODE_PRIVATE)
+    }
+
+    fun isPredictiveBackEnabledForBoot(): Boolean {
+        return dePrefs.getBoolean("enable_predictive_back", false)
+    }
+
     override var uiMode: String
         get() = prefs.getString("ui_mode", UiMode.DEFAULT_VALUE) ?: UiMode.DEFAULT_VALUE
         set(value) = prefs.edit { putString("ui_mode", value) }

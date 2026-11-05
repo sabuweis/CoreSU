@@ -41,14 +41,15 @@ class KernelSUApplication : Application(), ViewModelStoreOwner {
         super.onCreate()
         ksuApp = this
 
-        if (!isUserUnlocked()) {
-            return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            runCatching {
+                val enable = SettingsRepositoryImpl().isPredictiveBackEnabledForBoot()
+                setEnableOnBackInvokedCallback(applicationInfo, enable)
+            }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            val enable = SettingsRepositoryImpl().enablePredictiveBack
-            HiddenApiBypass.addHiddenApiExemptions("Landroid/content/pm/ApplicationInfo;->setEnableOnBackInvokedCallback")
-            setEnableOnBackInvokedCallback(applicationInfo, enable)
+        if (!isUserUnlocked()) {
+            return
         }
 
         val superUserViewModel = ViewModelProvider(this)[SuperUserViewModel::class.java]
